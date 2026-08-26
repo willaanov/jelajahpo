@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Wisata() {
     const [wisata, setWisata] = useState([]);
@@ -28,6 +29,9 @@ export default function Wisata() {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2>Daftar Wisata JelajahPo</h2>
+                <Link to="/wisata/tambah" className="btn btn-primary">
+                    + Tambah Wisata
+                </Link>
             </div>
 
             <table className="table table-bondered table-striped">
@@ -49,14 +53,14 @@ export default function Wisata() {
                                 <td>Rp {item.harga_tiket}</td>
                             </tr>
                         ))
-                    ) : ( 
+                    ) : (
                         <tr>
                             <td colSpan="4" className="text-center">
                                 Belum ada wisata
                             </td>
                         </tr>
                     )}
-                 </tbody>
+                </tbody>
             </table>
         </div>
     )
