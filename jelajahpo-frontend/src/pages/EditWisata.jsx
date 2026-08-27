@@ -32,7 +32,10 @@ export default function EditWisata() {
         if (window.confirm("yakin ingin mengedit wisata ini?")) {
             await fetch(`http://localhost:3001/wisata/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
                 body: JSON.stringify(formData),
             });
             alert("Wisata berhasil diperbarui!");
