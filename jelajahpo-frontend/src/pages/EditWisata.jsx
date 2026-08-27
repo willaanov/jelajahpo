@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-export default function AddWisata() {
+export default function EditWisata() {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nama_wisata: "",
         deskripsi: "",
@@ -9,36 +11,36 @@ export default function AddWisata() {
         id_kategori: "",
     });
 
+    const [loading, setLoading] = useState(true);
     const [kategori, setKategori] = useState([]);
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        fetch(`http://localhost:3001/wisata/${id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setFormData(data[0]); // ambil data pertama hasil query
+                setLoading(false);
+            })
+            .catch((err) => console.error(err));
+    }, [id]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const res = await fetch("http://localhost:3001/wisata", {
-                method: "POST",
+        if (window.confirm("yakin ingin mengedit wisata ini?")) {
+            await fetch(`http://localhost:3001/wisata/${id}`, {
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
-            if (res.ok) {
-                alert("Wisata berhasil ditambahkan!");
-                navigate("/wisata");
-            } else {
-                const data = await res.json();
-                alert(data.message || "Gagal menambah wisata");
-            }
-        } catch (err) {
-            console.error("Error:", err);
-            alert("Terjadi kesalahan saat menambah wisata");
-        }
+            alert("Wisata berhasil diperbarui!");
+            navigate("/wisata");
+        };
     }
 
-     useEffect(() => {
+    useEffect(() => {
         const getKategori = async () => {
             try {
                 const res = await fetch("http://localhost:3001/kategori");
@@ -52,10 +54,14 @@ export default function AddWisata() {
         getKategori();
     }, []);
 
+    if (loading) {
+        return <div className="container mt-4">Loading...</div>;
+    }
+
     return (
         <div className="container mt-4">
-            <h2 className="mb-3">Tambah Wisata </h2>
-            <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
+            <h2>Edit Wisata</h2>
+            <form onSubmit={handleSubmit} className="mt-3">
                 <div className="mb-3">
                     <label className="form-label">Nama Wisata</label>
                     <input
@@ -64,8 +70,6 @@ export default function AddWisata() {
                         value={formData.nama_wisata}
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Masukkan nama wisata"
-                        required
                     />
                 </div>
 
@@ -76,7 +80,6 @@ export default function AddWisata() {
                         value={formData.deskripsi}
                         onChange={handleChange}
                         className="form-control"
-                        placeholder="Masukkan deskripsi wisata"
                     ></textarea>
                 </div>
 
@@ -93,7 +96,7 @@ export default function AddWisata() {
                     />
                 </div>
 
-                    <select
+                <select
                     className="form-select py-2 mb-3"
                     name="id_kategori"
                     value={formData.id_kategori}
@@ -110,10 +113,10 @@ export default function AddWisata() {
                     })}
                 </select>
 
-                <button type="submit" className="btn btn-success">
-                    Simpan
+                <button type="submit" className="btn btn-success me-2">
+                    Simpan Perubahan
                 </button>
             </form>
         </div>
-    );
-};
+    )
+}
